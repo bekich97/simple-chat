@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime app</title>
+</head>
+<body>
+    <div class="container">
+        <label>Username</label>
+        <input type="text" id="username">
+        <button id="button">Click me</button>
+    </div>
+
+    <br><br>
+    <div id="log"></div>
+
+    <script>
+        var notificationSocket = new WebSocket('ws://'+window.location.host+'/ws/notifications/');
+        notificationSocket.onmessage = function(event){
+            const data = JSON.parse(event.data);
+            console.log(data.message);
+            document.querySelector('#log').innerHTML = (data.message + '<br/>');
+        };
+
+        notificationSocket.onclose = function(event){
+            console.error('Chat socket closed unexpectedly!');
+        };
+        
+        document.querySelector("#button").onclick = function (e) {
+            const username = document.querySelector("#username");
+            const message = username.value + ' clicked the button!';
+            notificationSocket.send(JSON.stringify({'message': message}));
+        };
+    </script>
+</body>
+</html>
